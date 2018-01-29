@@ -1,0 +1,28 @@
+ECE 2220 Fall 2017 MP4 Example tests for use with mp4randin
+./lab4 mp4randin < mp4randcommands > youroutput
+Verify that your output matches mp4randout exactly
+
+p 0
+p 1
+p 2
+p 3
+p 4
+p 5
+p 6
+p 7
+p 8
+p 9
+f 2e 9
+f 00 0
+g 5E
+g 0a
+s :-) 4
+t greatness,
+t 123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{
+t clemson
+w
+g 7E
+g ab
+g aa
+g FF
+q

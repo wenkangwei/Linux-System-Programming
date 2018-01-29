@@ -1,0 +1,11 @@
+This is an example input file for Prog_io.c
+1
+with comments included in the file
+2
+
+more lines 
+3.1415926
+1.57079
+0.785399
+0.5
+

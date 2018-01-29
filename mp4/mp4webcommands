@@ -1,0 +1,10 @@
+ECE 2220 Fall 2017 MP4 Example webs for use with mp4webinput
+./lab4 mp4webinput < mp4webcommands > youroutput
+Verify that your output matches mp4webout exactly
+
+w
+t False
+t Don't
+t www.clemson.edu
+q
+

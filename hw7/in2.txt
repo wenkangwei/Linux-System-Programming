@@ -1,0 +1,6 @@
+A test input file for Chain1.c
+45
+90
+180   this should give us -0?
+360
+

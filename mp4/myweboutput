@@ -1,0 +1,290 @@
+Processed 5000 packets.
+
+Simple sniffer commands
+
+f FF num : Search for first instance of byte (in hex) in packet number num
+g FF     : Search for first instance of byte in each packet
+s string num  : Search for first instance of string in packet number num
+t string      : Search for first instance of string in each packet
+w : Search all packets for website domain names
+p num : Print packet number num (formatted print)
+q     : Quit
+?     : Print this menu
+> 
+# :ECE 2220 Fall 2017 MP4 Example webs for use with mp4webinput
+> 
+# :./lab4 mp4webinput < mp4webcommands > youroutput
+> 
+# :Verify that your output matches mp4webout exactly
+> 
+# :
+> 
+www.stackoverflow.com
+www.stackoverflow.com
+www.stackoverflow.com
+www.clemson.edu
+www.navy.mil
+www.bar.foo
+www.baidu.com
+www.instagram.com
+www.nato.int
+www.nasco.int
+www.bar.foo
+www.wordpress.com
+www.imgur.com
+www.youtube.com
+www.brown.doc
+www.wordpress.com
+www.nafo.int
+www.af.mil
+www.sohu.com
+www.sohu.com
+www.usa.gov
+www.qq.com
+www.wikipedia.org
+www.instagram.com
+www.youtube.com
+www.netflix.com
+www.yahoo.com
+www.wordpress.org
+www.youtube.com
+www.msn.com
+www.tmall.com
+www.google.com
+www.example.tld
+www.example.tld
+www.example.tld
+www.reddit.com
+www.usa.gov
+www.bar.foo
+www.sohu.com
+www.bing.com
+www.navy.mil
+www.netflix.com
+www.wordpress.org
+www.bing.com
+www.qq.com
+Found websites in 45 unique packets
+> 
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   0-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   0-1]  .  i  l  l                                     
+          2E 69 6C 6C XX XX XX XX XX XX XX XX XX XX XX XX
+                     
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   2-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   2-1]  .                                              
+          2E XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+            
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   5-0]  F  a  l  s  e     A  l  a  r  m  :     w  w    
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 XX
+          ^ -----------|                              
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   7-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   7-1]  .  s  c  .  e  d                               
+          2E 73 63 2E 65 64 XX XX XX XX XX XX XX XX XX XX
+                           
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   9-0]  F  a  l  s  e     A  l  a  r  m  :     N  e  a 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 4E 65 61
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[   9-1]  r  .  c  o  m  .                               
+          72 2E 63 6F 6D 2E XX XX XX XX XX XX XX XX XX XX
+                           
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  15-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  . 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 2E
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  15-1]  N  e  a  r  .  c  o  m  .                      
+          4E 65 61 72 2E 63 6F 6D 2E XX XX XX XX XX XX XX
+                                    
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  21-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  21-1]  N  e  a  r  .  c  o  m  .                      
+          4E 65 61 72 2E 63 6F 6D 2E XX XX XX XX XX XX XX
+                                    
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  32-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  32-1]  .  N  e  a  r  .  c  o  .  m                   
+          2E 4E 65 61 72 2E 63 6F 2E 6D XX XX XX XX XX XX
+                                       
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  41-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  41-1]  .  N  e  a  r  .  c  o                         
+          2E 4E 65 61 72 2E 63 6F XX XX XX XX XX XX XX XX
+                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  52-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  52-1]  .  N  e  a  r  c  o  m                         
+          2E 4E 65 61 72 63 6F 6D XX XX XX XX XX XX XX XX
+                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  53-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  53-1]  .  $  N  e  a  r  .  c  o  m                   
+          2E 24 4E 65 61 72 2E 63 6F 6D XX XX XX XX XX XX
+                                       
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  93-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[  93-1]  .  N  e  a  r  !  .  c  o  m                   
+          2E 4E 65 61 72 21 2E 63 6F 6D XX XX XX XX XX XX
+                                       
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 106-0]  F  a  l  s  e     A  l  a  r  m  :     N  e  a 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 4E 65 61
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 106-1]  r     w  w  w  .  .  c  o  m                   
+          72 20 77 77 77 2E 2E 63 6F 6D XX XX XX XX XX XX
+                                       
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 110-0]  F  a  l  s  e     A  l  a  r  m  :     N  e  a 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 4E 65 61
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 110-1]  r     w  w  w  .  c  o  m  .  c  o             
+          72 20 77 77 77 2E 63 6F 6D 2E 63 6F XX XX XX XX
+                                             
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 112-0]  F  a  l  s  e     A  l  a  r  m  :     w  w  w 
+          46 61 6C 73 65 20 41 6C 61 72 6D 3A 20 77 77 77
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 112-1]  .  a  l  m  o  s  t  1  N  e  a  r  .  c  o  m 
+          2E 61 6C 6D 6F 73 74 31 4E 65 61 72 2E 63 6F 6D
+                                                         
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 112-2]  1                                              
+          31 XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+            
+
+Found string: 'False' in 15 unique packets
+> 
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 116-0]  D  o  n  '  t     m  i  s  s  :     B  l  u  e 
+          44 6F 6E 27 74 20 6D 69 73 73 3A 20 42 6C 75 65
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 116-1]  R  i  d  g  e  .  c  o  m     w  w  w  .  s  t 
+          52 69 64 67 65 2E 63 6F 6D 20 77 77 77 2E 73 74
+                                                         
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 116-2]  a  c  k  o  v  e  r  f  l  o  w  .  c  o  m    
+          61 63 6B 6F 76 65 72 66 6C 6F 77 2E 63 6F 6D XX
+                                                      
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 137-0]  D  o  n  '  t     m  i  s  s  :     w  w  w  . 
+          44 6F 6E 27 74 20 6D 69 73 73 3A 20 77 77 77 2E
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 137-1]  B  l  u  e  R  i  d  g  e  $  w  w  w  .  $    
+          42 6C 75 65 52 69 64 67 65 24 77 77 77 2E 24 20
+                                                         
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 137-2]  w  w  w  .  s  t  a  c  k  o  v  e  r  f  l  o 
+          77 77 77 2E 73 74 61 63 6B 6F 76 65 72 66 6C 6F
+                                                         
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 137-3]  w  .  c  o  m                                  
+          77 2E 63 6F 6D XX XX XX XX XX XX XX XX XX XX XX
+                        
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 159-0]  D  o  n  '  t     m  i  s  s  :     B  l  u  e 
+          44 6F 6E 27 74 20 6D 69 73 73 3A 20 42 6C 75 65
+          ^ -----------|                                 
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 159-1]     w  w  w  .  $  w  w  w  .  s  t  a  c  k  o 
+          20 77 77 77 2E 24 77 77 77 2E 73 74 61 63 6B 6F
+                                                         
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 159-2]  v  e  r  f  l  o  w  .  c  o  m                
+          76 65 72 66 6C 6F 77 2E 63 6F 6D XX XX XX XX XX
+                                          
+
+Found string: 'Don't' in 3 unique packets
+> 
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 405-0]     w  w  w  .  c  l  e  m  s  o  n  .  e  d  u 
+          D4 77 77 77 2E 63 6C 65 6D 73 6F 6E 2E 65 64 75
+             ^ -----------------------------------------|
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 405-1]     p           :     ,  ~     "                
+          AC 70 F4 8A 9D 3A 0C 2C 7E 0B 22 D9 C8 A3 91 19
+                                                         
+
+          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5 
+[ 405-2]  #                                              
+          23 83 XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+               
+
+Found string: 'www.clemson.edu' in 1 unique packets
+> 
+Goodbye

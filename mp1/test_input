@@ -1,0 +1,34 @@
+5    # minimum threat level
+3    # false alarm threshold
+10   # Start of first set of samples
+5
+2
+5
+50
+5
+-1
+10   # second set of samples
+5
+5
+10
+5
+10
+-1
+4     # third set of samples
+4
+4
+4
+-1
+1000  # fourth set of samples
+5
+1000
+5
+5
+5
+10
+20
+-1
+10    # fourth set of samples
+-1 
+-2    # exit
+

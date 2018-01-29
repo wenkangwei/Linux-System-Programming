@@ -1,0 +1,130 @@
+
+MP2: Vigenere cipher with signature
+Commands:
+	enc 16-hex-digits 2-hex-digits (keyword)
+	dec 16-hex-digits 2-hex-digits (keyword) 1-hex-digit (signature)
+	quit
+# :Examples for MP2
+# :                           Test 1
+
+Encoding plaintext: 1234567890abcdef with key 73
+Plaintext as hex number: 1234567890abcdef
+ 0001 0010 0011 0100 0101 0110 0111 1000 1001 0000 1010 1011 1100 1101 1110 1111
+    1    2    3    4    5    6    7    8    9    0    a    b    c    d    e    f
+Generate key from input: 73, Key length: 7 Keyword: 1110011
+ 1110 0111 1100 1111 1001 1111 0011 1110 0111 1100 1111 1001 1111 0011 1110 0111
+    e    7    c    f    9    f    3    e    7    c    f    9    f    3    e    7
+Ciphertext
+ 1111 0101 1111 1011 1100 1001 0100 0110 1110 1100 0101 0010 0011 1110 0000 1000
+    f    5    f    b    c    9    4    6    e    c    5    2    3    e    0    8
+B0 : 1
+B1 : 1
+B2 : 1
+B3 : 1
+Ciphertext with signature: f5fbc946ec523e08  73 F
+
+
+Decoding: f5fbc946ec523e08 with signature f and key: 73
+Generate key from input: 73, Key length: 7 Keyword: 1110011
+ 1110 0111 1100 1111 1001 1111 0011 1110 0111 1100 1111 1001 1111 0011 1110 0111
+    e    7    c    f    9    f    3    e    7    c    f    9    f    3    e    7
+Cipher as hex number: f5fbc946ec523e08
+ 1111 0101 1111 1011 1100 1001 0100 0110 1110 1100 0101 0010 0011 1110 0000 1000
+    f    5    f    b    c    9    4    6    e    c    5    2    3    e    0    8
+B0 : 1
+B1 : 1
+B2 : 1
+B3 : 1
+Plaintext
+ 0001 0010 0011 0100 0101 0110 0111 1000 1001 0000 1010 1011 1100 1101 1110 1111
+    1    2    3    4    5    6    7    8    9    0    a    b    c    d    e    f
+ Original plaintext: 1234567890ABCDEF
+
+# :                           Test 2
+
+Decoding: 1234567890abcedf with signature F and key: 73
+Generate key from input: 73, Key length: 7 Keyword: 1110011
+ 1110 0111 1100 1111 1001 1111 0011 1110 0111 1100 1111 1001 1111 0011 1110 0111
+    e    7    c    f    9    f    3    e    7    c    f    9    f    3    e    7
+Cipher as hex number: 1234567890abcedf
+ 0001 0010 0011 0100 0101 0110 0111 1000 1001 0000 1010 1011 1100 1110 1101 1111
+    1    2    3    4    5    6    7    8    9    0    a    b    c    e    d    f
+B0 : 0
+B1 : 0
+B2 : 1
+B3 : 0
+Message is not from a trusted source!
+
+Decoding: 68a549cdecf8a549 with signature C and key: 1F
+keyword is invalid: 1F, 1f
+# :                           Test 3
+
+Encoding plaintext: 8888888888888888 with key fe
+Plaintext as hex number: 8888888888888888
+ 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000
+    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8
+Generate key from input: fe, Key length: 8 Keyword: 11111110
+ 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110
+    f    e    f    e    f    e    f    e    f    e    f    e    f    e    f    e
+Ciphertext
+ 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110
+    7    6    7    6    7    6    7    6    7    6    7    6    7    6    7    6
+B0 : 0
+B1 : 1
+B2 : 1
+B3 : 1
+Ciphertext with signature: 7676767676767676  fe E
+
+
+Decoding: 7676767676767676 with signature e and key: fe
+Generate key from input: fe, Key length: 8 Keyword: 11111110
+ 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110 1111 1110
+    f    e    f    e    f    e    f    e    f    e    f    e    f    e    f    e
+Cipher as hex number: 7676767676767676
+ 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110 0111 0110
+    7    6    7    6    7    6    7    6    7    6    7    6    7    6    7    6
+B0 : 0
+B1 : 1
+B2 : 1
+B3 : 1
+Plaintext
+ 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000
+    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8
+ Original plaintext: 8888888888888888
+
+# :                           Test 4
+
+Encoding plaintext: abcdefabcdefabcd with key 4a
+Plaintext as hex number: abcdefabcdefabcd
+ 1010 1011 1100 1101 1110 1111 1010 1011 1100 1101 1110 1111 1010 1011 1100 1101
+    a    b    c    d    e    f    a    b    c    d    e    f    a    b    c    d
+Generate key from input: 4a, Key length: 7 Keyword: 1001010
+ 1001 0101 0010 1010 0101 0100 1010 1001 0101 0010 1010 0101 0100 1010 1001 0101
+    9    5    2    a    5    4    a    9    5    2    a    5    4    a    9    5
+Ciphertext
+ 0011 1110 1110 0111 1011 1011 0000 0010 1001 1111 0100 1010 1110 0001 0101 1000
+    3    e    e    7    b    b    0    2    9    f    4    a    e    1    5    8
+B0 : 1
+B1 : 1
+B2 : 0
+B3 : 1
+Ciphertext with signature: 3ee7bb029f4ae158  4a B
+
+
+Decoding: 3ee7bb029f4ae158 with signature b and key: 4a
+Generate key from input: 4a, Key length: 7 Keyword: 1001010
+ 1001 0101 0010 1010 0101 0100 1010 1001 0101 0010 1010 0101 0100 1010 1001 0101
+    9    5    2    a    5    4    a    9    5    2    a    5    4    a    9    5
+Cipher as hex number: 3ee7bb029f4ae158
+ 0011 1110 1110 0111 1011 1011 0000 0010 1001 1111 0100 1010 1110 0001 0101 1000
+    3    e    e    7    b    b    0    2    9    f    4    a    e    1    5    8
+B0 : 1
+B1 : 1
+B2 : 0
+B3 : 1
+Plaintext
+ 1010 1011 1100 1101 1110 1111 1010 1011 1100 1101 1110 1111 1010 1011 1100 1101
+    a    b    c    d    e    f    a    b    c    d    e    f    a    b    c    d
+ Original plaintext: ABCDEFABCDEFABCD
+
+Goodbye

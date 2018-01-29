@@ -1,0 +1,14 @@
+Examples for MP2
+                           Test 1
+enc 1234567890abcdef 73
+dec f5fbc946ec523e08  73 f
+                           Test 2
+dec 1234567890abcedf 73 F
+dec 68a549cdecf8a549 1F C
+                           Test 3
+enc 8888888888888888 fe
+dec 7676767676767676  fe e
+                           Test 4
+enc abcdefabcdefabcd 4a
+dec 3ee7bb029f4ae158  4a b
+quit

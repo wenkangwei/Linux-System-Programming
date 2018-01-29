@@ -1,0 +1,568 @@
+/* lab8.c
+ *
+ * Wenkang Wei                                 
+ * wenkanw 
+ * ECE 2220, Fall 2017
+ * MP8
+ *
+ * Purpose: A chat program.  For this assignment you add code to
+ *          display the text using a split screen
+ *
+ * Assumptions: The port number MYPORT is assumed to be free.  If you
+ *              get a failed to bind message try changing the port number
+ *              to a larger value (but just increase by +1 until you find
+ *              an open port)
+ *
+ *              To connect to a remote chat program, the port number use by
+ *              both programs must be the same.
+ *
+ *             When debugging may leave terminal in bad state. To reset do:
+ *                 stty sane
+ *				backspace function is added to program
+ *
+ * Command line arguments: The hostname to chat with.
+ *   
+ * Known bugs: Need to implement curses code
+ *
+ *
+ * You can chat with yourself by using
+ *    ./chat localhost
+ *
+ * to chat between two different machines run chat on each
+ * machine with the other machine name as the argument.  However, most
+ * packets seem to be blocked by either firewalls or NAT.  Running both
+ * programs on different apolloXX.ces.clemson.edu works.
+ *
+ * This program is based on code posted at Beej's Guide to Network
+ * Programming found at http://www.beej.us/guide/bgnet/ 
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/wait.h>
+#include <curses.h>
+#define MYPORT "4950"  // the port users will be connecting to
+#define SCREEN_TOP		0
+#define SCREEN_BOTTOM	1
+#define MAXBUFLEN 		100
+
+
+// list type  used to store input text
+typedef struct STRLIST{
+	char *text;
+	struct STRLIST *next;
+} Str_List;
+
+
+// function prototypes
+void set_DividerBar(int row, char *text);
+void addWinText(int win_num,int row, int col,char *text);
+int set_ListString( Str_List *root,int index,  char *str);
+void free_list(Str_List *root );
+Str_List* create_linkedlist( int list_size);
+void update_screen(int win_num, Str_List *list, int screen_size);
+void backspace(int win_num, int row, int col, char *buf, int *cnt );
+void scroll_screen(Str_List *root, int scroll_times);
+// Collect input from keyboard and send packet to remote host
+//
+// input: sockfd  -- a socket has already been set up to the remote host
+//
+// output: 
+//    print input from keyboard to bottom half of screen
+//
+//    return a flag to indicate the program should quit
+//         1 -- user typed "quit" so tell main to end
+//         0 -- default: do not quit
+//
+int chat_talker(int sockfd)
+{
+	static	Str_List *screen_list;
+    char buf[MAXBUFLEN];
+	char ch;
+	int i=0;
+    int numbytes;
+    int quit_flag = 0;   // change to 1 when user types quit
+	int list_size= LINES-2-(LINES/2);
+	int screen_size=LINES/2-2;
+	static char list_flag=0;
+	//create list to store screen data
+	if(list_flag==0){
+		screen_list= create_linkedlist(list_size);
+		list_flag=1;
+	}
+	//receive input from keyboard
+ 	while((ch=getch())!='\n' ){
+		if(ch==8 || ch==127 ){//backspace
+		 backspace(SCREEN_BOTTOM, LINES-1, 0, buf,&i );
+		}
+		else{
+		buf[i++]=ch;
+		}
+	}
+	
+	//clean command line
+	move(LINES-1,0);
+	clrtoeol();
+
+    buf[i] = '\0';  // chomp end of line
+	numbytes=i+1;
+    if (strcmp(buf, "quit") == 0) {
+		send(sockfd,buf,strlen(buf),0);//send quit command to end remote terminal
+        quit_flag = 1;
+		free_list(screen_list);
+		list_flag=0;
+		return quit_flag;
+    }
+	//update screen
+	scroll_screen(screen_list, 1);			//update list data
+	set_ListString(screen_list,list_size-1,buf);//add input to the last item in list
+	update_screen(SCREEN_BOTTOM, screen_list,screen_size);
+	// send text to socket/remote user
+    if ((numbytes = send(sockfd, buf, strlen(buf), 0)) == -1) {
+		move(LINES-1,0);
+		clrtoeol();				//clean input line	
+		free_list(screen_list);//free space
+		list_flag=0;
+		endwin();				//reset terminal
+        exit(1);
+    }
+    return quit_flag;
+}
+
+// Receive packets from a remote host.  
+//
+// input: sockfd  -- a socket has already been set up to the remote host
+//
+// output: should print received data to top half of the screen
+//
+void chat_listener(int sockfd)
+{
+    char buf[MAXBUFLEN];
+    int numbytes;
+	int list_size=LINES/2, screen_size=LINES/2;
+	static	char list_flag=0;
+	static	Str_List *topscreen_list;
+	if(list_flag==0){
+		topscreen_list= create_linkedlist(list_size);
+		list_flag=1;
+	}
+	//clean buffer
+	
+	memset(buf,'\0',MAXBUFLEN);
+	// receive text from remote user
+    if ((numbytes = recv(sockfd, buf, MAXBUFLEN-1 , 0)) == -1) {
+		free_list(topscreen_list);
+		endwin();//reset terminal
+        exit(1);
+    }
+	//if input= "quit", exit program
+	if(strcmp(buf,"quit")==0 ){
+	free_list(topscreen_list);
+	endwin();//reset terminal
+	exit(0);
+	}
+	// update top of the screen
+	scroll_screen(topscreen_list, 1);			//update list data
+	set_ListString(topscreen_list,list_size-1,buf);//add input to the last item in list
+	update_screen(SCREEN_TOP, topscreen_list, screen_size);
+}
+
+/* main sets up the structures with IP address information and calls
+ * socket, bind, and connect to set up the details of the UDP socket.
+ *
+ * Use the select() function to wait for input from either the keyboard
+ * or from the remote host
+ *
+ * Changes to main should be minimal.  Just initialize curses
+ * and clean up at end.  All other work is in the two
+ *    chat_talker
+ *    chat_listener
+ * functions that collect input that needs to be displayed
+ */
+int main(int argc, char *argv[])
+{
+    int sockfd;
+    struct addrinfo hints, *addr_result, *p;
+    int rv;
+	char *divider_text;
+	char host_name[]="remote host:";
+	int divider_Pos;
+	char *divider_addr;
+
+
+    if (argc != 2) {
+        fprintf(stderr, "usage: chat hostname\n");
+        exit(1);
+    }
+
+    // set up details for address information data structure
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC; // set to AF_INET to force IPv4
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE; // use my IP
+
+    // first: open socket and bind to port on my host so
+    // we can receive packets on this port
+
+    // This fills in structure with IP details for the local host
+    if ((rv = getaddrinfo(NULL, MYPORT, &hints, &addr_result)) != 0) {
+        fprintf(stderr, "getaddrinfo my host: %s\n", gai_strerror(rv));
+        return 1;
+    }
+    // loop through all the results and bind to the first we can
+    for(p = addr_result; p != NULL; p = p->ai_next) {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                        p->ai_protocol)) == -1) {
+            perror("chat: socket");
+            continue;
+        }
+        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+            close(sockfd);
+            perror("chat: bind");
+            continue;
+        }
+        break;
+    }
+    if (p == NULL) {
+        fprintf(stderr, "chat: failed to bind to socket\n");
+        return 2;
+    }
+    freeaddrinfo(addr_result);
+
+    // second: repeat with remote host IP details so we can
+    // connect this socket to the remote host only.  As an extension
+    // you could use a different port number for the remote host.
+    if ((rv = getaddrinfo(argv[1], MYPORT, &hints, &addr_result)) != 0) {
+        fprintf(stderr, "getaddrinfo remote host: %s\n", gai_strerror(rv));
+        return 1;
+    }
+    // loop through all the results and connect to the first we can
+    for(p = addr_result; p != NULL; p = p->ai_next) {
+        if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+            close(sockfd);
+            perror("chat: connect");
+            continue;
+        }
+        break;
+    }
+    if (p == NULL) {
+        fprintf(stderr, "chat: failed to connect socket\n");
+        return 2;
+    }
+    freeaddrinfo(addr_result);
+
+    // End of code to set up UDP socket
+
+    fprintf(stderr, "chat: waiting to chat with %s\n", argv[1]);
+
+    // set up master set of file descriptors to use with select
+    fd_set master;
+    fd_set read_fds;
+
+    FD_ZERO(&master);
+    FD_ZERO(&read_fds);
+    FD_SET(0, &master);   // standard input is zero
+    FD_SET(sockfd, &master);
+	/***********Initialize curses terminal*************/
+	initscr();
+	clear();	
+	divider_text= (char *) malloc((COLS+1)*sizeof(char));
+	//set divider bar text
+	if(COLS< 10)
+	{
+		sprintf(divider_text,"chat" );
+	}
+	else{
+	memset(divider_text,' ',COLS );						//add placeholder
+	divider_addr= divider_text+COLS-2-strlen(argv[1]);	//move to end of string
+	memcpy(divider_text, host_name, strlen(host_name) );// set string "remote host:"
+	memcpy(divider_addr, argv[1], strlen(argv[1]));		// copy host name
+	}
+	divider_text[COLS]='\0';
+	divider_Pos=LINES/2;								//set divider bar position
+	set_DividerBar(divider_Pos, divider_text);
+
+    int quit_flag = 0;    // changed by chat_talker when user types quit
+    while(quit_flag == 0) {
+        // specify who to monitor on this trial.  We want both
+        read_fds = master;
+        // block and wait for input from stdin or socket
+        if (select(sockfd+1, &read_fds, NULL, NULL, NULL) == -1) {
+            perror("chat: select");
+            exit(4);
+        }
+
+        // which one is set?  Rare, but both could be set
+        if (FD_ISSET(0, &read_fds)) {
+            quit_flag = chat_talker(sockfd);      // keyboard input
+        } 
+        if (FD_ISSET(sockfd, &read_fds)) {
+            chat_listener(sockfd);                // remote host sent data
+        } 
+    }
+	endwin();
+	free(divider_text);
+    close(sockfd);
+
+    return 0;
+}
+
+/*
+*	@brief addWinText:
+*		this function is to set the text line to screen. Input win_num
+*		determine which screen you want to add text
+*
+*	@para win_num
+*		this number determines which part of the screen you want to add
+*		0: top of the screen
+*		1: bottom of the screen
+*	@para *text
+*		the new text line added to the screen
+*/
+
+void addWinText(int win_num,int row, int col ,char *text )
+{
+	int pos_y=0;
+	switch(win_num)
+	{
+		case 0:// top of screen
+		pos_y=row;
+		break;
+		case 1://bottom of screen
+		pos_y=LINES/2+1+row;
+		break;
+
+	}	
+	// scroll up the screen
+	//add new text line
+	move(pos_y,col);
+	addstr(text);
+	//update screen 
+	refresh();
+	move(LINES-1,0);
+
+}
+
+/*
+*	@brief set_DividerBar:
+*		This function is to set divider bar on the given position
+*		with the given text
+*
+*	@para row:
+*		the row number to set the divider bar
+*	@para *text:
+*		the text added to the bar
+*/
+void set_DividerBar(int row, char *text )
+{
+	
+	move(row,0);
+	standout();//make the line bare
+	addstr(text);//set text
+	move(row,COLS-1);
+	standend();
+	refresh();
+	move(LINES-1,0);//move back to command line
+	clrtoeol();
+}
+
+
+/*
+*
+*	@brief create_linkedlist:
+*			it is to create a single linked list used for update screen
+*	@para	list_size:
+*			size of the list 
+*	@return: it returns the address of the root of list
+*/
+Str_List* create_linkedlist( int list_size)
+{
+	int i=0;
+	Str_List *ptr;
+	//create root
+	Str_List *list=(Str_List *) calloc(1,sizeof(Str_List) );
+	list->text= (char *)calloc(MAXBUFLEN,sizeof(char));
+	ptr=list;
+	//clean memory and allocate data
+	for(i=0;i< list_size-1;i++)
+	{
+	list->next= (Str_List * )calloc(1,sizeof(Str_List) );
+	list->next->text= (char *)calloc(MAXBUFLEN,sizeof(char));
+	list=list->next;
+	}
+	//end of list
+
+	return ptr;
+}
+
+/*
+*	@brief free_list
+*			it is to free the list used for screen update
+*
+*	@para	root:
+*			root of list
+*
+*/
+void free_list(Str_List *root )
+{
+	Str_List *ptr;
+	while(root!=NULL)
+	{
+		ptr=root;
+		//if node is not empty, free space
+		if(root->text!=NULL)
+			free(root->text);
+		//if the next node exist, move to next node
+		root=root->next;
+		free(ptr);
+	}
+}
+
+
+/*
+*	@brief set_ListString
+*			it is to store command line to the list in the given index
+*	@para:	index:
+*			store string to which position in the list
+*	@para:	*str
+*			string to be stored
+*
+*/
+int set_ListString( Str_List *root,int index,  char *str)
+{
+	int i=0;
+	if(index<0)
+		return -1;
+
+	while(root!=NULL){
+		if(i!=index) {
+			i++;
+			root=root->next;
+		}
+		else 
+		{
+			
+			//insert successfully
+			if(root->text!=NULL &&  strlen(str)< MAXBUFLEN){
+				//reset memory
+				memset(root->text,'\0',MAXBUFLEN);
+				memcpy(root->text, str,strlen(str));
+				return 1;
+			}
+			else
+				return -1;
+		}
+		
+	
+	}
+	return 0;
+}
+
+/*
+*	@brief scroll_screen
+*			it is to scroll up the data in the list of screen
+*	@para *root
+*			root of the list
+*	@para scroll_times:
+*			
+*/
+
+void scroll_screen(Str_List *root, int scroll_times)
+{
+	int i=0;
+	Str_List *ptr= root;
+	for(i=0; i< scroll_times;i++)
+	{	
+		root=ptr;//reset root address
+		while(root!=NULL && root->next!=NULL)
+		{
+					if(root->text !=NULL && root->next->text!=NULL){
+						memset(root->text,'\0',MAXBUFLEN);
+						memcpy(root->text, root->next->text, strlen(root->next->text ));
+						root=root->next;//move to next node
+					}
+					else break;
+		}
+	}
+}
+
+
+
+/*
+*	@brief:	update_screen
+*			it is to update the screen text
+*	@para:	win_num
+*			which screen to update, top screen or bottom screen
+*	@para:	*list
+*			list containing previous text 
+*	@para:	screen_size:
+*			size of screen
+*/
+
+void update_screen(int win_num, Str_List *list, int screen_size )
+{
+	int row;
+	//set the first row in window
+	switch(win_num)
+	{
+		case SCREEN_TOP:
+		row=0;
+		break;
+		case SCREEN_BOTTOM:
+		row=LINES/2+1;
+		break;
+
+	}
+
+	for(;row< screen_size+row; row++ )
+	{
+		move(row,0);
+		clrtoeol();//clean text
+		addstr(list->text );
+		if(list->next!=NULL)
+			list=list->next;
+		else break;
+	}
+	//return to leftmost corner
+	move(LINES-1,0);
+	clrtoeol();
+	refresh();
+}
+
+
+
+
+/*
+* @brief	backspace:
+*			this function is to present backspace function. when program
+*			get backspace signal, buffer string -1 and update command line
+*@para		win_num:
+*			which screen to backspace
+*
+*@para		row:	position y
+*@para		col:	position x
+*@para		*buf:	buffer storing command line
+*@para		*cnt:	index of character in command line
+*
+*/
+
+void backspace(int win_num, int row, int col, char *buf, int *cnt )
+{
+	
+	//delete character
+	buf[(*cnt)--]='\0';
+	buf[*cnt]='\0';		
+	//update input line
+	move(row,col);
+	clrtoeol();
+	addWinText(win_num,row,col,buf);
+	move(row,strlen(buf));
+}
